@@ -1,0 +1,38 @@
+/*
+There is only one situation that water can be trapped, that is the bar forms (high low high). In this way, we can use a decreasing monotonic stack to represent the first 2 (high low), if we meet a higher height[i] that is bigger than the peek of the stack, it will trigger water trapped. (about monotonic stack, can refer to #84 https://leetcode.com/problems/largest-rectangle-in-histogram/)
+
+When we find a bigger value than the peek of the stack, we can get the peek as the bottom of the trap, since it is the smallest value by so far (it is the low in "high low high"). And we need to define the height by finding the smaller one of left bound(height[stack.peek()]) and right bound(height[i]) and use the smaller one - the bottom of the trap.
+
+Finally, we multiply the height with width (i-s.peek()-1) and get the area.
+
+We need to notice that when we find a bigger value than the peek of the stack, there may be only one element in the stack. In this situation, it means there is no left bound, so it cannot form a water trap, we can skip directly.
+
+*/
+
+
+
+class Solution {
+    fun trap(height: IntArray): Int {
+        var stack = mutableListOf<Int>()
+        var res = 0
+        fun peek():Int{
+            return stack[stack.size-1]
+        }
+        
+        fun pop():Int{
+            return stack.removeAt(stack.size-1)
+        }
+        
+        for(i in height.indices){
+            while(!stack.isEmpty() && height[i] > height[peek()]){
+                var temp = pop()
+                if(!stack.isEmpty()){
+                    res += (Math.min(height[i],height[peek()]) - height[temp])*(i-peek()-1)
+                }
+            }
+            stack.add(i)
+        }
+        
+        return res
+    }
+}
